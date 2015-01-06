@@ -39,8 +39,9 @@ std::string Boat::get_name(void) const
 {
 	return (this->name);
 }
+```
 
-
+```c++
 // Boat.h
 #ifndef BOAT_H
 #define BOAT_H
