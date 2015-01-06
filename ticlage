@@ -23,8 +23,8 @@ class CppGenerator
     header = []
     header << "#ifndef #{@name.upcase}_H"
     header << "#define #{@name.upcase}_H\n"
-    header << "class #{@name.capitalize}\n{"
-    header << "public:\n"
+    header << "class #{@name.capitalize}\n{\n"
+    header << "public:"
 
     # constructors
     header << "\t#{@name.capitalize}();"
@@ -36,10 +36,10 @@ class CppGenerator
       header << "\t#{e[:type]} get_#{e[:name]}(void) const;"
     end
 
-    header << "private:\n"
+    header << "private:"
     # private members
     @attributes.each {|e| header << "\t#{e[:type]} #{e[:name]};"}
-    header << "};\n#endif\n"
+    header << "};\n\n#endif\n"
     return header.join "\n"
   end
 
