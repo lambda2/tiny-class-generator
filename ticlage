@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+
+class CppGenerator
+
+  def initialize(name, args)
+    @name = name;
+    @attributes = args.map do |e|
+      a = e.split(":")
+      a.length >= 2 ? {name: a.slice!(0, 1).first, type: a.join(":")} : {name: a.first, type: "int"}
+    end
+  end
+
+  def generate
+    header_target = open("#{@name.capitalize}.h", 'w')
+    header_target.write(self.generate_header)
+    header_target.close
+    body_target = open("#{@name.capitalize}.cpp", 'w')
+    body_target.write(self.generate_body)
+    body_target.close
+  end
+
+  def generate_header
+    header = []
+    header << "#ifndef #{@name.upcase}_H"
+    header << "#define #{@name.upcase}_H\n"
+    header << "class #{@name.capitalize}\n{"
+    header << "public:\n"
+
+    # constructors
+    header << "\t#{@name.capitalize}();"
+    header << "\t~#{@name.capitalize}();\n"
+
+    # accessors
+    @attributes.each do |e|
+      header << "\tvoid set_#{e[:name]}(#{e[:type]} value);"
+      header << "\t#{e[:type]} get_#{e[:name]}(void) const;"
+    end
+
+    header << "private:\n"
+    # private members
+    @attributes.each {|e| header << "\t#{e[:type]} #{e[:name]};"}
+    header << "};\n#endif\n"
+    return header.join "\n"
+  end
+
+  def generate_body
+    body = []
+    body << "#include \"#{@name.capitalize}.h\""
+
+    # constructors
+    body << "#{@name.capitalize}::#{@name.capitalize}()\n{\n\n}\n"
+    body << "#{@name.capitalize}::~#{@name.capitalize}()\n{\n\n}\n"
+
+    # accessors
+    @attributes.each do |e|
+      body << "void #{@name.capitalize}::set_#{e[:name]}(#{e[:type]} value)\n{\n\tthis->#{e[:name]} = value;\n}\n"
+      body << "#{e[:type]} #{@name.capitalize}::get_#{e[:name]}(void) const\n{\n\treturn (this->#{e[:name]});\n}\n"
+    end
+    return body.join "\n"
+  end
+
+end
+
+args = ARGV
+class_name = args.slice!(0, 1).first
+class_generator = CppGenerator.new(class_name, args)
+class_generator.generate
