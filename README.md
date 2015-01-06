@@ -1,4 +1,4 @@
-tiny-class-generator
+TIny CLAss GEnerator
 ====================
 
 A tiny cpp class bootstraper
