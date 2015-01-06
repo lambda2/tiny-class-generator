@@ -6,7 +6,11 @@ A tiny cpp class bootstraper
 ## Usage
 `ticlage [className] [[attribute:type]...]`
 
-ex: `$> ticlage boat length:int name:std::string` will generate Boat.cpp and Boat.h like:
+ex:
+```sh
+$> ticlage boat length:int name:std::string
+```
+will generate Boat.cpp and Boat.h like:
 ```c++
 // Boat.cpp
 #include "Boat.h"
