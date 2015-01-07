@@ -1,6 +1,17 @@
 #!/usr/bin/env ruby
 
+class String
+  def s_capitalize
+    return self.slice(0, 1).upcase + self.slice(1, self.length)
+  end
+
+  def s_classify
+    return self.split("_").map { |e| e.s_capitalize }.join ""
+  end
+end
+
 class CppGenerator
+
 
   def initialize(name, args)
     @name = name;
@@ -11,10 +22,10 @@ class CppGenerator
   end
 
   def generate
-    header_target = open("#{@name.capitalize}.h", 'w')
+    header_target = open("#{@name.s_capitalize}.hpp", 'w')
     header_target.write(self.generate_header)
     header_target.close
-    body_target = open("#{@name.capitalize}.cpp", 'w')
+    body_target = open("#{@name.s_capitalize}.cpp", 'w')
     body_target.write(self.generate_body)
     body_target.close
   end
@@ -23,17 +34,20 @@ class CppGenerator
     header = []
     header << "#ifndef #{@name.upcase}_H"
     header << "#define #{@name.upcase}_H\n"
-    header << "class #{@name.capitalize}\n{\n"
+    header << "#include <iostream>\n" if @attributes.map{|e| e[:type]}.join(" ").include? "std::"
+    header << "class #{@name.s_capitalize}\n{\n"
     header << "public:"
 
     # constructors
-    header << "\t#{@name.capitalize}();"
-    header << "\t~#{@name.capitalize}();\n"
+    header << "\t#{@name.s_capitalize}();" # default
+    header << "\t#{@name.s_capitalize}(#{@name.s_capitalize} const &src);" # copy
+    header << "\t~#{@name.s_capitalize}();\n"
+    header << "\t#{@name.s_capitalize}& operator=(#{@name.s_capitalize} const &src);\n"
 
     # accessors
     @attributes.each do |e|
-      header << "\tvoid set_#{e[:name]}(#{e[:type]} value);"
-      header << "\t#{e[:type]} get_#{e[:name]}(void) const;"
+      header << "\tvoid set#{e[:name].s_classify}(#{e[:type]} value);"
+      header << "\t#{e[:type]} get#{e[:name].s_classify}(void) const;"
     end
 
     header << "private:"
@@ -45,16 +59,24 @@ class CppGenerator
 
   def generate_body
     body = []
-    body << "#include \"#{@name.capitalize}.h\""
+    body << "#include \"#{@name.s_capitalize}.hpp\"\n"
 
     # constructors
-    body << "#{@name.capitalize}::#{@name.capitalize}()\n{\n\n}\n"
-    body << "#{@name.capitalize}::~#{@name.capitalize}()\n{\n\n}\n"
+    body << "#{@name.s_capitalize}::#{@name.s_capitalize}()\n{ }\n"
+
+    init = @attributes.map {|e| "#{e[:name]}(src.#{e[:name]})"}.join ", "
+    body << "#{@name.s_capitalize}::#{@name.s_capitalize}(#{@name.s_capitalize} const &src) : #{init}\n{ }\n"
+
+    body << "#{@name.s_capitalize}::~#{@name.s_capitalize}()\n{\n\n}\n"
+
+    copy = @attributes.map {|e| "\tthis->#{e[:name]} = src.#{e[:name]};"}.join "\n"
+    body << "#{@name.s_capitalize} &#{@name.s_capitalize}::operator=(#{@name.s_capitalize} const &src)\n{\n"
+    body << "#{copy}\n\treturn (*this);\n}\n"
 
     # accessors
     @attributes.each do |e|
-      body << "void #{@name.capitalize}::set_#{e[:name]}(#{e[:type]} value)\n{\n\tthis->#{e[:name]} = value;\n}\n"
-      body << "#{e[:type]} #{@name.capitalize}::get_#{e[:name]}(void) const\n{\n\treturn (this->#{e[:name]});\n}\n"
+      body << "void #{@name.s_capitalize}::set#{e[:name].s_classify}(#{e[:type]} value)\n{\n\tthis->#{e[:name]} = value;\n}\n"
+      body << "#{e[:type]} #{@name.s_capitalize}::get#{e[:name].s_classify}(void) const\n{\n\treturn (this->#{e[:name]});\n}\n"
     end
     return body.join "\n"
   end
