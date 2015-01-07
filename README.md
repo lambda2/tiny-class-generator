@@ -1,4 +1,4 @@
-tiny-class-generator
+TIny CLAss GEnerator
 ====================
 
 A tiny cpp class bootstraper
@@ -6,7 +6,11 @@ A tiny cpp class bootstraper
 ## Usage
 `ticlage [className] [[attribute:type]...]`
 
-ex: `ticlage boat length:int name:std::string` wille generate Boat.cpp and Boat.h like:
+ex:
+```sh
+$> ticlage boat length:int name:std::string
+```
+will generate Boat.cpp and Boat.h like:
 ```c++
 // Boat.cpp
 #include "Boat.h"
@@ -48,8 +52,8 @@ std::string Boat::get_name(void) const
 
 class Boat
 {
-public:
 
+public:
 	Boat();
 	~Boat();
 
@@ -57,10 +61,11 @@ public:
 	int get_length(void) const;
 	void set_name(std::string value);
 	std::string get_name(void) const;
+	
 private:
-
 	int length;
 	std::string name;
 };
+
 #endif
 ```
