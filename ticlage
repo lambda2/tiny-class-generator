@@ -41,7 +41,7 @@ class CppGenerator
     # constructors
     header << "\t#{@name.s_capitalize}();" # default
     header << "\t#{@name.s_capitalize}(#{@name.s_capitalize} const &src);" # copy
-    header << "\t~#{@name.s_capitalize}();\n"
+    header << "\tvirtual ~#{@name.s_capitalize}();\n"
     header << "\t#{@name.s_capitalize}& operator=(#{@name.s_capitalize} const &src);\n"
 
     # accessors
